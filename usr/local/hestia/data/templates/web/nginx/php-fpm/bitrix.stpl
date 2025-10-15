@@ -1,0 +1,78 @@
+#=========================================================================#
+# Default Web Domain Template                                             #
+# DO NOT MODIFY THIS FILE! CHANGES WILL BE LOST WHEN REBUILDING DOMAINS   #
+# https://hestiacp.com/docs/server-administration/web-templates.html      #
+#=========================================================================#
+    
+# HTTPS vhost: serve the app here.
+server {
+    listen       %ip%:%web_ssl_port% ssl;
+    server_name  %domain_idn% %alias_idn%;
+    root         %sdocroot%;
+    index        index.php index.html index.htm;
+    
+    access_log   /var/log/nginx/domains/%domain%.log combined;
+    access_log   /var/log/nginx/domains/%domain%.bytes bytes;
+    error_log    /var/log/nginx/domains/%domain%.error.log error;
+    
+    ssl_certificate     %ssl_pem%;
+    ssl_certificate_key %ssl_key%;
+    ssl_stapling        on;
+    ssl_stapling_verify on;
+
+    # Optional: extra TLS/HSTS include managed by Hestia (if present).
+    include %home%/%user%/conf/web/%domain%/nginx.hsts.conf*;
+
+    # Block hidden files like .git, .env, etc. (except .well-known for ACME).
+    location ~ /\.(git|svn|hg|bzr|env|htaccess|ini|log|conf|bak|swp)$ {
+        deny all;
+        return 404;
+    }
+    
+    # MAIN router: serve static if exists, otherwise hand over to Bitrix once.
+    # We use a named location to avoid external 301/302 loops.
+    location / {
+        try_files $uri $uri/ @bitrix;
+    }
+        
+    # Cache typical static assets aggressively (no PHP hit).
+    location ~* \.(?:jpg|jpeg|png|webp|gif|bmp|ico|svg|css|js)$ {
+        expires max;
+        access_log off;
+        add_header Cache-Control "public";
+        fastcgi_hide_header "Set-Cookie";
+    }
+    
+    # SECURITY: block access to sensitive Bitrix internals and caches directly.
+    location ~* ^/bitrix/(?:modules|php_interface)/ { deny all; }
+    location ~* ^/(?:bitrix/cache|bitrix/managed_cache|upload/resize_cache)/ {
+        access_log off;
+        add_header Cache-Control "public, max-age=2592000";
+        try_files $uri =404;
+    }
+    location ~* \.(?:htaccess|env|ini|log|conf|bak|swp)$ { deny all; }
+        
+    # PHP handler (generic). Do not place redirects here.
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT   $document_root;
+        
+        # Ensure the app "sees" HTTPS and correct host/port.
+        fastcgi_param HTTPS       $https if_not_empty;
+        fastcgi_param SERVER_PORT 443;
+        fastcgi_param HTTP_HOST   $host;
+
+        fastcgi_pass %backend_lsnr%;
+    }
+        
+    # Named location: resolve pretty URLs exactly once via Bitrix urlrewrite.php.
+    location @bitrix {
+        rewrite ^ /bitrix/urlrewrite.php last;
+    }
+
+    # Optional: raise upload limit if you need large media.
+    client_max_body_size 64m;
+}
