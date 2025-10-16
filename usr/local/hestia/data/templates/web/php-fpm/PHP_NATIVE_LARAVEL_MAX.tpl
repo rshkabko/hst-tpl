@@ -23,8 +23,7 @@ pm.max_requests = 2000
 pm.process_idle_timeout = 10s
 pm.status_path = /status
 request_slowlog_timeout = 5s
-slowlog = /home/%user%/logs/%domain%/php-slow.log
-process_control_timeout = 2s
+slowlog = /home/%user%/web/%domain%/logs/php-slow.log
 
 php_admin_value[upload_tmp_dir] = /home/%user%/tmp
 php_admin_value[session.save_path] = /home/%user%/tmp
