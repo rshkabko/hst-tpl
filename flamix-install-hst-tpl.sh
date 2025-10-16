@@ -18,7 +18,6 @@ find "$ROOT" -type f \( \
   -name "README.md" -o \
   -name ".DS_Store" \
 \) -print -delete
-find "$ROOT" -type d \( -name ".github" -o -name ".git" \) -prune -print -exec rm -rf {} +
 
 echo "Copying to root (soft overwrite)..."
 rsync -a "$ROOT/" /
