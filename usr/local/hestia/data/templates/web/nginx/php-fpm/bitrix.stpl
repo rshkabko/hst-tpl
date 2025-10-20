@@ -32,6 +32,9 @@ server {
     # MAIN router: serve static if exists, otherwise hand over to Bitrix once.
     # We use a named location to avoid external 301/302 loops.
     location / {
+        # Slash redirect /folder -> /folder/
+        rewrite ^(/[^.?]*[^/])$ $1/ permanent;
+
         try_files $uri $uri/ @bitrix;
     }
         
