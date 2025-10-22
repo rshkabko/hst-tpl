@@ -7,7 +7,12 @@
 server {
         listen      %ip%:%web_ssl_port% ssl;
         server_name %domain_idn% %alias_idn%;
-        root        %sdocroot%/current/public;
+        # Dynamic app root
+        set $app_root %sdocroot%/current/public;
+        if ($host ~* ^dev) {
+                set $app_root %sdocroot%/releases/dev;
+        }
+        root $app_root;
         index       index.php index.html index.htm;
         access_log  /var/log/nginx/domains/%domain%.log combined;
         access_log  /var/log/nginx/domains/%domain%.bytes bytes;
