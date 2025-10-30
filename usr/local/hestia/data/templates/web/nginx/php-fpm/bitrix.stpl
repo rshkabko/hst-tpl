@@ -10,7 +10,7 @@ server {
     server_name  %domain_idn% %alias_idn%;
     root         %sdocroot%;
     index        index.php index.html index.htm;
-    error_page 404 = /404.php;
+    error_page 404 =404 /404.php;
     
     access_log   /var/log/nginx/domains/%domain%.log combined;
     access_log   /var/log/nginx/domains/%domain%.bytes bytes;
@@ -74,6 +74,17 @@ server {
 
         fastcgi_pass %backend_lsnr%;
     }
+
+    location = /404.php {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/404.php;
+        fastcgi_param DOCUMENT_ROOT   $document_root;
+        fastcgi_param HTTPS           $https if_not_empty;
+        fastcgi_param SERVER_PORT     443;
+        fastcgi_param HTTP_HOST       $host;
+        fastcgi_pass %backend_lsnr%;
+    }
+
         
     # Named location: resolve pretty URLs exactly once via Bitrix urlrewrite.php.
     location @bitrix {
