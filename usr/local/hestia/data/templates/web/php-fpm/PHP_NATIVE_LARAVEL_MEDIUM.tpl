@@ -36,7 +36,9 @@ php_admin_value[max_input_vars] = 10000
 php_admin_value[opcache.memory_consumption] = 256
 php_admin_value[opcache.interned_strings_buffer] = 32
 php_admin_value[opcache.max_accelerated_files] = 150000
-php_admin_value[opcache.revalidate_freq] = 60
+php_admin_value[opcache.validate_timestamps] = 1
+php_admin_value[opcache.revalidate_freq] = 5
+php_admin_value[opcache.revalidate_path] = 1
 
 env[PATH] = /usr/local/bin:/usr/bin:/bin
 env[TMP] = /home/%user%/tmp
