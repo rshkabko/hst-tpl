@@ -91,6 +91,9 @@ server {
         rewrite ^ /bitrix/urlrewrite.php last;
     }
 
+    # For Lets Encrypt
+    include %home%/%user%/conf/web/%domain%/nginx.ssl.conf_*;
+
     # Optional: raise upload limit if you need large media.
     client_max_body_size 64m;
 }
