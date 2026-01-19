@@ -14,5 +14,7 @@ server {
 
     # 301 to HTTPS + canonical host (non-www). 
     # If you prefer www — see note below.
-    return 301 https://%domain_idn%$request_uri;
+    location / {
+        return 301 https://%domain_idn%$request_uri;
+    }
 }
