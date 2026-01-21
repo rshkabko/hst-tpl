@@ -10,7 +10,7 @@ server {
         # Dynamic app root
         set $app_root %sdocroot%/current/public;
         if ($host ~* ^dev) {
-                set $app_root %sdocroot%/releases/dev;
+                set $app_root %sdocroot%/releases/dev/public;
         }
         root $app_root;
         index       index.php index.html index.htm;
