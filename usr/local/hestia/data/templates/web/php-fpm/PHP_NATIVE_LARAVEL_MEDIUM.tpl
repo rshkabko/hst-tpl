@@ -39,6 +39,8 @@ php_admin_value[opcache.max_accelerated_files] = 150000
 php_admin_value[opcache.validate_timestamps] = 1
 php_admin_value[opcache.revalidate_freq] = 5
 php_admin_value[opcache.revalidate_path] = 1
+php_admin_value[realpath_cache_size] = 4096K
+php_admin_value[realpath_cache_ttl]  = 5
 
 env[PATH] = /usr/local/bin:/usr/bin:/bin
 env[TMP] = /home/%user%/tmp
