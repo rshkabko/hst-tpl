@@ -24,6 +24,16 @@ server {
     # Optional: extra TLS/HSTS include managed by Hestia (if present).
     include %home%/%user%/conf/web/%domain%/nginx.hsts.conf*;
 
+    # Canonical host: www -> non-www
+    if ($host ~* ^www\.(.+)$) {
+        return 301 $scheme://$1$request_uri;
+    }
+
+    # Normalize double slashes: // -> /
+    if ($request_uri ~ "//") {
+        return 301 $scheme://$host$uri$is_args$args;
+    }
+
     # Block hidden files like .git, .env, etc. (except .well-known for ACME).
     location ~ /\.(git|svn|hg|bzr|env|htaccess|ini|log|conf|bak|swp)$ {
         deny all;
